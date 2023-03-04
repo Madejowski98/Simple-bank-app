@@ -1,6 +1,6 @@
 'use strict';
 
-// .toFixed is used in this code, I am aware that in a ideal situation it should be (number * 100) / 100, but it's not real money in this app, I'm also aware that .toFixed is rounding numbers
+//! .toFixed is used in this code, I am aware that in a ideal situation it should be (number * 100) / 100, but it's not real money in this app, I'm also aware that .toFixed is rounding numbers
 (function () {
   const account1 = {
     owner: 'Szymon Madejowski',
@@ -45,7 +45,7 @@
   const accounts = [account1, account2];
 
   /////////////////////////////////////////////////
-  // Elements
+  //! Elements
   const labelWelcome = document.querySelector('.welcome');
   const labelDate = document.querySelector('.date');
   const labelBalance = document.querySelector('.balance__value');
@@ -91,7 +91,7 @@
 
     return new Intl.DateTimeFormat(locale).format(date);
   };
-  // SHOWING MOVEMENTS IN ACCOUNTS
+  //! SHOWING MOVEMENTS IN ACCOUNTS
   const showMovements = (acc, sort = false) => {
     containerMovements.innerHTML = '';
 
@@ -143,7 +143,7 @@
       acc.locale,
       acc.currency
     );
-    // I am aware that filter is map and filter in one but it's easier to use it like this for me for this app
+    //! I am aware that filter is map and filter in one but it's easier to use it like this for me for this app
     const out = acc.movements
       .filter(mov => mov < 0)
       .reduce((acc, movement) => acc + movement, 0);
@@ -178,28 +178,44 @@
   createUsernames(accounts);
 
   const updateUI = function (acc) {
-    // display movement
     showMovements(acc);
-    //display balance
     calculateDisplayBalance(acc);
-    //display summary
     calculateDisplaySummary(acc);
   };
 
   const startLogOutTimer = function () {
+    const tick = function () {
+      // call timer every second
+      const minutess = String(Math.trunc(time / 60)).padStart(2, 0);
+      const secondss = String(time % 60).padStart(2, 0);
+      //in each call print the remaining time to the user interface
+      labelTimer.textContent = `${minutess}:${secondss}`;
+
+      // when the time is at 0 stop timer and log out (hide UI)
+      if (time === 0) {
+        clearInterval(timer);
+        labelWelcome.textContent = 'Log in to get started';
+        containerApp.style.opacity = 0;
+      }
+      // decrease 1 s
+      time--;
+    };
     // setting the time to 5 minutes
-    // call timer every second
-    //in each call print the remaining time to the user interface
-    // when the time is at 0 stop timer and log out (hide UI)
+    let time = 300;
+    // call the timer every second
+    tick();
+    const timer = setInterval(tick, 1000);
+
+    return timer;
   };
 
-  // event handlers
-  let currentAccount;
+  //! event handlers
+  let currentAccount, timer;
 
-  // faking always logged in
-  currentAccount = account1;
-  updateUI(currentAccount);
-  containerApp.style.opacity = 100;
+  //! faking always logged in
+  // currentAccount = account1;
+  // updateUI(currentAccount);
+  // containerApp.style.opacity = 100;
 
   const currentDate = new Date();
   const day = `${currentDate.getDate()}`.padStart(2, 0);
@@ -217,14 +233,14 @@
     console.log(currentAccount);
 
     if (currentAccount?.pin === +inputLoginPin.value) {
-      //display message
+      //! display message
       labelWelcome.textContent = `Welcome back ${
         currentAccount.owner.split(' ')[0]
       }`;
       containerApp.style.opacity = 100;
       containerApp.style.visibility = 'visible';
 
-      //CREATING CURRENT DATE AND TIME FOR TRANSFERS
+      //!CREATING CURRENT DATE AND TIME FOR TRANSFERS
 
       const now = new Date();
       const options = {
@@ -240,9 +256,13 @@
         options
       ).format(now);
 
-      // clear input field
+      //! clear input field
       inputLoginUsername.value = inputLoginPin.value = '';
       inputLoginPin.blur();
+
+      if (timer) clearInterval(timer);
+
+      timer = startLogOutTimer();
 
       updateUI(currentAccount);
     }
@@ -264,13 +284,18 @@
     ) {
       currentAccount.movements.push(amountOfTransfer);
       receivableAccount.movements.push(amountOfTransfer);
-      // add transfer date for main and receivable acc
+      //! add transfer date for main and receivable acc
       currentAccount.movementsDates.push(new Date().toISOString());
       receivableAccount.movementsDates.push(new Date().toISOString());
+
       updateUI(currentAccount);
+
+      // reset the timer
+      clearInterval(timer);
+      timer = startLogOutTimer();
     }
   });
-  // REQ A LOAN
+  //! REQ A LOAN
   btnLoan.addEventListener('click', function (event) {
     event.preventDefault();
 
@@ -287,13 +312,16 @@
         currentAccount.movementsDates.push(new Date().toISOString());
 
         updateUI(currentAccount);
+        // reset the timer
+        clearInterval(timer);
+        timer = startLogOutTimer();
       }, 2500);
     }
 
     inputLoanAmount.value = '';
   });
 
-  // REMOVING A USER
+  //! REMOVING A USER
   btnClose.addEventListener('click', function (event) {
     event.preventDefault();
     if (
@@ -319,7 +347,7 @@
     sorted = !sorted;
   });
 
-  //event handler for colors orangered on 2 when clicking label balance and blue on 3
+  //!event handler for colors orangered on 2 when clicking label balance and blue on 3
   labelBalance.addEventListener('click', function () {
     [...document.querySelectorAll('.movements__row')].forEach(function (
       row,
@@ -330,60 +358,14 @@
     });
   });
 
-  const calculateDayPassed = (date1, date2) =>
-    Math.abs(date2 - date1) / (1000 * 60 * 60 * 24);
-
-  const days1 = calculateDayPassed(
-    new Date(2024, 10, 5, 15, 10, 8),
-    new Date(2024, 10, 19, 15)
-  );
-  // console.log(days1);
-
-  const opti = {
-    style: 'unit',
-    unit: 'mile-per-hour',
-  };
-
-  const setTimeout = function () {
-    console.log('chuj ci w dupe');
-  };
   //
 })();
 
-// jak string z 111 zmienic na bezpieczny - createElement , textContent!
+//! jak string z 111 zmienic na bezpieczny - createElement , textContent!
 
 // __ BEM - Block-element-modifier
 
-(function () {})();
-
-{
-  a: 'dupa';
-}
-() => {};
-
-(function () {
-  console.log('dupa');
-})();
-
-function pa() {}
-
-const array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const sławek = { szymon: [1, 2, 3] };
-
-setTimeout(function () {
-  setTimeout(function () {
-    console.log('dupa0');
-  });
-  console.log('dupa1');
-});
-
-function lol() {
-  return function lol2() {};
-}
-const wynik = lol();
-wynik();
-
 const mojdif = document.createElement('div');
 mojdif.setAttribute('type', 'debil');
-// mojdif.textContent = 'you are a moron';
+// mojdif.textContent = 'not good boss';
 document.body.appendChild(mojdif);
